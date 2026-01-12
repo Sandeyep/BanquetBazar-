@@ -1,10 +1,21 @@
 
+import { Route, Routes } from "react-router-dom";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+
+
 const App = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold "> React with Tailwind template for my final year project</h1>
-    </div>
-  )
-}
+    <>
 
-export default App
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Register/>} />
+         <Route path="/register" element={<Register/>} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </>
+  );
+};
+
+export default App;
