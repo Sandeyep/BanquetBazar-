@@ -1,115 +1,108 @@
 import { useState } from "react";
-import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 
-const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+function Register() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
 
-  const togglePassword = () => setShowPassword(!showPassword);
-  const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/accounts/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      console.log(data);
+
+      if (res.ok) {
+        toast.success("Signup successful! You can now login.");
+
+        // ✅ Redirect to login page after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = "/login"; // or use navigate("/login") if using react-router
+        }, 1500);
+      } else {
+        // ✅ Handle backend errors
+        const errorMessage =
+          data.email?.[0] || data.username?.[0] || data.detail || "Account already exists";
+        toast.error(errorMessage);
+      }
+    } catch (error) {
+      console.log("Registration error:", error);
+      toast.error("Something went wrong. Try again!");
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-purple-300 via-pink-200 to-indigo-300 px-4">
-      
-      {/* Card */}
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-10 transform transition-all duration-500 hover:scale-105">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+      {/* ✅ Toaster container for notifications */}
+      <Toaster position="top-right" reverseOrder={false} />
 
-        {/* Title */}
-        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-2">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm space-y-5"
+      >
+        <h2 className="text-2xl font-bold text-center text-gray-800">
           Create Account
         </h2>
-        <p className="text-center text-gray-500 mb-8">
-          Sign up to start booking halls with <span className="text-indigo-600 font-semibold">BanquetBazar</span>
-        </p>
 
-        {/* Form */}
-        <form className="space-y-6">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+          onChange={handleChange}
+          required
+        />
 
-          {/* Full Name */}
-          <div className="relative">
-            <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-            />
-          </div>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+          onChange={handleChange}
+          required
+        />
 
-          {/* Email */}
-          <div className="relative">
-            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-            />
-          </div>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+          onChange={handleChange}
+          required
+        />
 
-          {/* Password */}
-          <div className="relative">
-            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-            />
-            <button
-              type="button"
-              onClick={togglePassword}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-indigo-500"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 rounded-lg font-semibold hover:scale-105 transform transition"
+        >
+          Sign Up
+        </button>
 
-          {/* Confirm Password */}
-          <div className="relative">
-            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm Password"
-              className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
-            />
-            <button
-              type="button"
-              onClick={toggleConfirmPassword}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-indigo-500"
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
-
-          {/* Register Button */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-300"
-          >
-            Sign Up
-          </button>
-        </form>
-
-        {/* Divider */}
-        <div className="my-6 flex items-center">
-          <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="px-3 text-gray-400 text-sm">OR</span>
-          <div className="flex-1 h-px bg-gray-300"></div>
-        </div>
-
-        {/* Login Link */}
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-gray-500 text-sm">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-indigo-500 font-semibold hover:underline"
+          <a
+            href="/login"
+            className="text-pink-500 font-medium hover:underline"
           >
-            Login here
-          </Link>
+            Login
+          </a>
         </p>
-
-      </div>
+      </form>
     </div>
   );
-};
+}
 
 export default Register;
