@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -12,35 +14,22 @@ function Register() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const { register } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/accounts/register/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-      console.log(data);
-
-      if (res.ok) {
-        toast.success("Signup successful! You can now login.");
-
-        // ✅ Redirect to login page after 1.5 seconds
-        setTimeout(() => {
-          window.location.href = "/login"; // or use navigate("/login") if using react-router
-        }, 1500);
-      } else {
-        // ✅ Handle backend errors
-        const errorMessage =
-          data.email?.[0] || data.username?.[0] || data.detail || "Account already exists";
-        toast.error(errorMessage);
-      }
+      await register(formData);
+      toast.success("Signup successful! You can now login.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (error) {
       console.log("Registration error:", error);
-      toast.error("Something went wrong. Try again!");
+      const errorMessage = error.response?.data?.email?.[0] || error.response?.data?.username?.[0] || "Registration failed";
+      toast.error(errorMessage);
     }
   };
 

@@ -1,21 +1,27 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import get_user_model
+from rest_framework import status, permissions
+from .serializers import UserSerializer, RegisterSerializer
 
-User = get_user_model()
-
-@csrf_exempt
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def register_view(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if not username or not password:
-        return Response({"error": "username and password required"}, status=400)
-
-    if User.objects.filter(username=username).exists():
-        return Response({"error": "user already exists"}, status=400)
-
-    User.objects.create_user(username=username, password=password)
-    return Response({"message": "user created successfully"}, status=201)
+@api_view(['GET', 'PATCH'])
+@permission_classes([permissions.IsAuthenticated])
+def user_profile(request):
+    if request.method == 'GET':
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+    
+    elif request.method == 'PATCH':
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
