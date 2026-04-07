@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axiosInstance';
 import toast from 'react-hot-toast';
-import { PlusCircle, Trash2, Edit, MapPin, Building2 } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, MapPin, Building2, Star, RefreshCw, Banknote, X } from 'lucide-react';
 
 const ManageHalls = () => {
     const [halls, setHalls] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editingHall, setEditingHall] = useState(null);
+    const [isSyncing, setIsSyncing] = useState(false);
 
     const [hallForm, setHallForm] = useState({
         name: '',
@@ -16,7 +17,16 @@ const ManageHalls = () => {
         description: '',
         event_types: [],
         google_maps_link: '',
-        image: null
+        image: null,
+        rating: 4.0,
+        price_per_plate: 500,
+        decoration_price: 10000,
+        makeup_price: 5000,
+        dj_price: 5000,
+        photography_price: 10000,
+        galleryImages: [],
+        existingImages: [],
+        menu: {} // { "Category": ["Item 1", "Item 2"] }
     });
 
     const EVENT_TYPE_OPTIONS = ['Wedding', 'Corporate', 'Birthday', 'Social', 'Other'];
@@ -34,10 +44,14 @@ const ManageHalls = () => {
         const formData = new FormData();
 
         Object.keys(hallForm).forEach(key => {
-            if (key === 'event_types') {
+            if (key === 'event_types' || key === 'menu') {
                 formData.append(key, JSON.stringify(hallForm[key]));
             } else if (key === 'image' && hallForm[key]) {
                 formData.append(key, hallForm[key]);
+            } else if (key === 'galleryImages') {
+                hallForm.galleryImages.forEach(file => {
+                    formData.append('images', file);
+                });
             } else if (hallForm[key] !== null && hallForm[key] !== '') {
                 formData.append(key, hallForm[key]);
             }
@@ -73,7 +87,16 @@ const ManageHalls = () => {
             description: hall.description,
             event_types: hall.event_types || [],
             google_maps_link: hall.google_maps_link || '',
-            image: null
+            image: null,
+            rating: hall.rating || 4.0,
+            price_per_plate: hall.price_per_plate || 500,
+            decoration_price: hall.decoration_price || 10000,
+            makeup_price: hall.makeup_price || 5000,
+            dj_price: hall.dj_price || 5000,
+            photography_price: hall.photography_price || 10000,
+            galleryImages: [],
+            existingImages: hall.images || [],
+            menu: hall.menu || {}
         });
         setShowForm(true);
     };
@@ -99,10 +122,85 @@ const ManageHalls = () => {
             description: '',
             event_types: [],
             google_maps_link: '',
-            image: null
+            image: null,
+            rating: 4.0,
+            price_per_plate: 500,
+            decoration_price: 10000,
+            makeup_price: 5000,
+            dj_price: 5000,
+            photography_price: 10000,
+            galleryImages: [],
+            existingImages: [],
+            menu: {}
         });
         setEditingHall(null);
         setShowForm(false);
+    };
+
+    const handleSyncAI = async () => {
+        setIsSyncing(true);
+        const toastId = toast.loading("Synchronizing AI model... Please wait.");
+        try {
+            const response = await api.post('/ai/sync/');
+            toast.success(response.data.message, { id: toastId });
+        } catch (error) {
+            toast.error("Failed to sync AI model. Check server logs.", { id: toastId });
+            console.error(error);
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
+    const handleDeleteExistingImage = async (imageId) => {
+        if (window.confirm("Remove this image from gallery?")) {
+            try {
+                await api.delete(`/hall-images/${imageId}/`);
+                setHallForm(prev => ({
+                    ...prev,
+                    existingImages: prev.existingImages.filter(img => img.id !== imageId)
+                }));
+                toast.success("Image removed");
+                fetchHalls(); // Refresh to update counts
+            } catch (error) {
+                toast.error("Failed to remove image");
+                console.error(error);
+            }
+        }
+    };
+
+    const handleAddMenuCategory = (category) => {
+        if (!category) return;
+        setHallForm(prev => ({
+            ...prev,
+            menu: { ...prev.menu, [category]: [] }
+        }));
+    };
+
+    const handleAddMenuItem = (category, item) => {
+        if (!item) return;
+        setHallForm(prev => ({
+            ...prev,
+            menu: { 
+                ...prev.menu, 
+                [category]: [...prev.menu[category], item]
+            }
+        }));
+    };
+
+    const handleRemoveMenuItem = (category, index) => {
+        setHallForm(prev => ({
+            ...prev,
+            menu: {
+                ...prev.menu,
+                [category]: prev.menu[category].filter((_, i) => i !== index)
+            }
+        }));
+    };
+
+    const handleRemoveMenuCategory = (category) => {
+        const newMenu = { ...hallForm.menu };
+        delete newMenu[category];
+        setHallForm({ ...hallForm, menu: newMenu });
     };
 
     const toggleEventType = (type) => {
@@ -125,13 +223,23 @@ const ManageHalls = () => {
                         </h1>
                         <p className="text-gray-600 mt-1">Add, edit, and manage your banquet halls</p>
                     </div>
-                    <button
-                        onClick={() => setShowForm(!showForm)}
-                        className="bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition shadow-md"
-                    >
-                        <PlusCircle size={20} />
-                        {showForm ? 'Cancel' : 'Add New Hall'}
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={handleSyncAI}
+                            disabled={isSyncing}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition shadow-md ${isSyncing ? 'bg-gray-400 cursor-wait text-white' : 'bg-white text-indigo-600 border-2 border-indigo-600 hover:bg-indigo-50'}`}
+                        >
+                            <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
+                            {isSyncing ? 'Syncing...' : 'Sync AI Recommender'}
+                        </button>
+                        <button
+                            onClick={() => setShowForm(!showForm)}
+                            className="bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition shadow-md"
+                        >
+                            <PlusCircle size={20} />
+                            {showForm ? 'Cancel' : 'Add New Hall'}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Add/Edit Hall Form */}
@@ -156,14 +264,17 @@ const ManageHalls = () => {
                                     value={hallForm.location}
                                     onChange={e => setHallForm({ ...hallForm, location: e.target.value })}
                                 />
-                                <input
-                                    type="number"
-                                    placeholder="Price (Rs)"
-                                    className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                                    required
-                                    value={hallForm.price}
-                                    onChange={e => setHallForm({ ...hallForm, price: e.target.value })}
-                                />
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2 font-bold">Hall Rent (Base Price)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full bg-gray-50 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
+                                        value={hallForm.price}
+                                        onChange={e => setHallForm({ ...hallForm, price: e.target.value })}
+                                        placeholder="e.g. 50000"
+                                        required
+                                    />
+                                </div>
                                 <input
                                     type="number"
                                     placeholder="Capacity (Guests)"
@@ -172,6 +283,85 @@ const ManageHalls = () => {
                                     value={hallForm.capacity}
                                     onChange={e => setHallForm({ ...hallForm, capacity: e.target.value })}
                                 />
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        min="1"
+                                        max="5"
+                                        placeholder="Rating (1-5)"
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        required
+                                        value={hallForm.rating}
+                                        onChange={e => setHallForm({ ...hallForm, rating: e.target.value })}
+                                    />
+                                    <Star className="absolute right-3 top-3 text-yellow-400" size={20} fill="currentColor" />
+                                </div>
+                            </div>
+
+                            {/* Cost Estimation Details */}
+                            <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
+                                <h4 className="text-sm font-bold text-indigo-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <Banknote size={16} />
+                                    Cost Estimation Settings (AI Based)
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">Price per Plate (Rs)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Plate Price"
+                                            className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                            required
+                                            value={hallForm.price_per_plate}
+                                            onChange={e => setHallForm({ ...hallForm, price_per_plate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">Decoration Cost (Rs)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Decoration"
+                                            className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                            required
+                                            value={hallForm.decoration_price}
+                                            onChange={e => setHallForm({ ...hallForm, decoration_price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">DJ Cost (Rs)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="DJ"
+                                            className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                            required
+                                            value={hallForm.dj_price}
+                                            onChange={e => setHallForm({ ...hallForm, dj_price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">Makeup Artist (Rs)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Makeup"
+                                            className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                            required
+                                            value={hallForm.makeup_price}
+                                            onChange={e => setHallForm({ ...hallForm, makeup_price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label className="text-xs font-bold text-gray-500 ml-1">Photography (Rs)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="Photography"
+                                            className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                            required
+                                            value={hallForm.photography_price}
+                                            onChange={e => setHallForm({ ...hallForm, photography_price: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Event Types - Multiple Selection */}
@@ -226,16 +416,133 @@ const ManageHalls = () => {
                                 onChange={e => setHallForm({ ...hallForm, description: e.target.value })}
                             />
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Upload Image {editingHall && '(Leave empty to keep current image)'}
-                                </label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                                    onChange={e => setHallForm({ ...hallForm, image: e.target.files[0] })}
-                                />
+                            {/* Image Previews & Uploads */}
+                            <div className="bg-white p-6 rounded-xl border-2 border-dashed border-gray-200">
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Venue Visuals</h4>
+                                
+                                {/* Existing Images Grid */}
+                                {editingHall && (hallForm.existingImages.length > 0 || editingHall.image) && (
+                                    <div className="mb-6">
+                                        <p className="text-xs font-bold text-gray-400 mb-3">CURRENTLY UPLOADED</p>
+                                        <div className="flex flex-wrap gap-4">
+                                            {/* Main Image */}
+                                            {editingHall.image && (
+                                                <div className="relative group">
+                                                    <img src={editingHall.image} alt="Hero" className="w-24 h-24 object-cover rounded-xl border border-gray-200" />
+                                                    <div className="absolute top-0 right-0 bg-indigo-600 text-white text-[8px] px-1.5 py-0.5 rounded-bl-lg font-bold">HERO</div>
+                                                </div>
+                                            )}
+                                            {/* Gallery Images */}
+                                            {hallForm.existingImages.map(img => (
+                                                <div key={img.id} className="relative group">
+                                                    <img src={img.image} alt="Gallery" className="w-24 h-24 object-cover rounded-xl border border-gray-200" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteExistingImage(img.id)}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2 font-bold">
+                                            {editingHall ? 'Change Hero Image' : 'Main Hero Image'}
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition shadow-sm"
+                                            onChange={e => setHallForm({ ...hallForm, image: e.target.files[0] })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2 font-bold">
+                                            Add Gallery Photos
+                                        </label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition shadow-sm"
+                                            onChange={e => setHallForm({ ...hallForm, galleryImages: Array.from(e.target.files) })}
+                                        />
+                                        {hallForm.galleryImages.length > 0 && (
+                                            <p className="text-xs text-purple-600 mt-2 font-bold italic">
+                                                +{hallForm.galleryImages.length} new images selected
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Menu Builder */}
+                            <div className="bg-white p-6 rounded-xl border-2 border-dashed border-gray-200 mt-6">
+                                <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Catering Menu</h4>
+                                
+                                <div className="space-y-6">
+                                    {Object.entries(hallForm.menu).map(([category, items]) => (
+                                        <div key={category} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <h5 className="font-bold text-indigo-700 uppercase text-xs tracking-widest">{category}</h5>
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => handleRemoveMenuCategory(category)}
+                                                    className="text-red-500 hover:text-red-700 transition"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                            
+                                            <div className="flex flex-wrap gap-2 mb-3">
+                                                {items.map((item, idx) => (
+                                                    <span key={idx} className="bg-white px-3 py-1 rounded-full border border-gray-200 text-xs font-semibold flex items-center gap-2 group hover:border-red-200 hover:text-red-600 transition cursor-default">
+                                                        {item}
+                                                        <X size={10} className="cursor-pointer" onClick={() => handleRemoveMenuItem(category, idx)} />
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                <input 
+                                                    className="flex-1 text-xs border border-gray-200 p-2 rounded-lg outline-none focus:ring-1 focus:ring-indigo-300"
+                                                    placeholder={`Add item to ${category}...`}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            handleAddMenuItem(category, e.target.value);
+                                                            e.target.value = '';
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <div className="flex gap-2">
+                                        <input 
+                                            id="new-category-input"
+                                            className="flex-1 bg-gray-50 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
+                                            placeholder="New Category Name (e.g. Starters)"
+                                        />
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                const input = document.getElementById('new-category-input');
+                                                handleAddMenuCategory(input.value);
+                                                input.value = '';
+                                            }}
+                                            className="bg-indigo-600 text-white px-6 rounded-lg font-bold hover:bg-indigo-700 transition"
+                                        >
+                                            Add Category
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="flex gap-4">
@@ -272,6 +579,11 @@ const ManageHalls = () => {
                                         <Building2 size={48} />
                                     </div>
                                 )}
+                                {hall.images && hall.images.length > 0 && (
+                                    <div className="absolute bottom-2 right-2 bg-indigo-600/90 text-white text-[10px] px-2 py-1 rounded-md font-bold backdrop-blur-sm">
+                                        {hall.images.length + 1} PHOTOS
+                                    </div>
+                                )}
                             </div>
 
                             {/* Hall Details */}
@@ -288,7 +600,13 @@ const ManageHalls = () => {
                                         <MapPin size={14} className="mr-2 text-indigo-400" />
                                         {hall.location}
                                     </div>
-                                    <div>Capacity: {hall.capacity} guests</div>
+                                    <div className="flex items-center justify-between">
+                                        <span>Capacity: {hall.capacity} guests</span>
+                                        <div className="flex items-center text-yellow-600 font-bold">
+                                            <Star size={14} className="mr-1" fill="currentColor" />
+                                            {hall.rating}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Event Types Badges */}
@@ -298,6 +616,13 @@ const ManageHalls = () => {
                                             {type}
                                         </span>
                                     ))}
+                                </div>
+
+                                <div className="mb-4 grid grid-cols-2 gap-2 text-[10px] uppercase font-bold text-gray-400 border-t border-gray-50 pt-3">
+                                    <span>Plate: <span className="text-indigo-600">Rs {hall.price_per_plate}</span></span>
+                                    <span>DJ: <span className="text-indigo-600">Rs {hall.dj_price}</span></span>
+                                    <span>Decor: <span className="text-indigo-600">Rs {hall.decoration_price}</span></span>
+                                    <span>Photo: <span className="text-indigo-600">Rs {hall.photography_price}</span></span>
                                 </div>
 
                                 {/* Google Maps Link */}

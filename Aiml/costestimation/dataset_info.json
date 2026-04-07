@@ -1,0 +1,15 @@
+{
+    "total_rows": 3684,
+    "columns": [
+        "name",
+        "bg_img_link",
+        "mark",
+        "category",
+        "rating",
+        "price",
+        "address",
+        "role",
+        "city",
+        "int_price"
+    ]
+}

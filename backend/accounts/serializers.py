@@ -16,10 +16,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'role']
 
     def create(self, validated_data):
+        role = validated_data.get('role', 'customer')
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            role=validated_data.get('role', 'customer')
+            role=role,
+            is_staff=(role == 'admin')
         )
         return user

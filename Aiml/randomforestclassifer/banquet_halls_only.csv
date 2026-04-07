@@ -1,0 +1,13 @@
+name,capacity,city,int_price,rating,event_types,cost_per_plate,decoration,makeup_artist,dj,photography
+Crystal Ballroom,200,biratnagar,3000,4.9,"Corporate, Meeting",500,10000,5000,5000,10000
+Platinum Plaza,350,pokhara,2200,4.6,Social Gathering,500,10000,5000,5000,10000
+Silver Sands,90,delhi,4000,4.7,"Wedding, Reception",500,10000,5000,5000,10000
+Radiant Palace,294,lalitpur,1200,4.3,"Wedding, Reception",500,10000,5000,5000,10000
+Royale Diamond,175,lalitpur,20000,4.0,Wedding,500,10000,5000,5000,10000
+Golden Grove,500,kolkata,1000,3.8,"Wedding, Reception",500,10000,5000,5000,10000
+Iron Inn,120,kolkata,1100,4.0,"Birthday, Party",500,10000,5000,5000,10000
+Marble Manor,390,bhaktapur,2800,4.3,"Corporate, Meeting",500,10000,5000,5000,10000
+Sapphire Suites,449,sarlahi,1800,4.2,"Social Gathering, Wedding, Corporate",500,10000,5000,5000,10000
+Red Magic,99,"chabahil,kathmandu",9000,4.0,"Wedding, Corporate",500,10000,5000,5000,10000
+Emerald Haven,149,mumbai,2500,4.8,"Birthday, Party",500,10000,5000,5000,10000
+Bronze Belvedere,245,pokhara,1500,3.9,Social Gathering,500,10000,5000,5000,10000

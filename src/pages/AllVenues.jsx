@@ -167,7 +167,10 @@ const AllVenues = () => {
                                     <div className="p-5">
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="text-lg font-bold text-gray-900 leading-tight">{hall.name}</h3>
-                                            <span className="text-green-600 font-bold text-sm bg-green-50 px-2 py-1 rounded">Rs {parseFloat(hall.price).toLocaleString()}</span>
+                                            <div className="text-right">
+                                                <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Hall Rent</span>
+                                                <span className="text-indigo-600 font-bold text-sm bg-indigo-50 px-2 py-1 rounded">Rs {parseFloat(hall.price).toLocaleString()}</span>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-2 mb-4">

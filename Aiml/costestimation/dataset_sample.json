@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Woodapple Residency",
+        "bg_img_link": "https://cdn.venuelook.com/uploads/space_2877/1646029156_204x158.png",
+        "mark": "Karkardooma, Delhi",
+        "category": "banquet-halls",
+        "rating": 4.8,
+        "price": "Rs. 699 price per plat",
+        "address": "Near Karkarduma Court Metro Station,\nEverything that attracts a traveler to an Indian home, the warmth, hospitality, affection of its hosts and the charm of it allâ¦ everything is to be found in Wood Apple Residancy, it awaits your abode.It is a fusion of luxury, pleasure, enjoyment and memorable experience to cherish for. We believe in the concept of accessibility. Our location is our USP. Itâs just in the heart of East Delhi on Vikas Marg - minutes away from Patparganj Industrial Area; within a stone's throw from the Anand Vihar bus terminal & railway station. 100 m from Karkardooma Metro Station & 2 km from the famous Akshardham Temple. Further, located adjacent to the Nature's Basket, Indiaâs premier organic food store, makes Woodapple an ideal place to stay for our guests. Situated on the busiest roads of Delhi, we make sure that once you enter our premises we induce tranquillity & calmness, giving you the feel of natural ambience with soothing music, greenery & smiling faces while being at the centre of the busiest town of the capital of India. .",
+        "role": "NONE",
+        "city": "delhi",
+        "int_price": 699
+    },
+    {
+        "name": "Venizia Sarovar Portico",
+        "bg_img_link": "https://cdn.venuelook.com/uploads/space_1824/1707891791_204x158.png",
+        "mark": "Model Town, Delhi",
+        "category": "banquet-halls",
+        "rating": 4.9,
+        "price": "Rs. 1000 price per plat",
+        "address": "Aesthetically designed amidst the lush greenry in North Delhi, directly connected to ITO and Pragati Maidan, directly connected to ITO and Pragati Maidan, Grand Venezia hosts a bouquet of facilities to offer you an inspiring free MICE experience. The facilities include a multi purpose Business Centre along with Atrium Lobby to offer you the SPACE to host you Executive and Business meetings.",
+        "role": "Royal Hall",
+        "city": "delhi",
+        "int_price": 1000
+    },
+    {
+        "name": "Luxera Hotels Banquets Convention & Catering",
+        "bg_img_link": "https://cdn.venuelook.com/uploads/space_25396/1689066467_204x158.png",
+        "mark": "Mg Road, Delhi",
+        "category": "banquet-halls",
+        "rating": 4.6,
+        "price": "Rs. 1800 price per plat",
+        "address": "Near Ambience Mall Mall,\nLuxera Hotels Banquets Convention & Catering, the ideal destination for luxury weddings is located at MG road, Delhi. At Luxera Hotels Banquets Convention & CateringÂ we leave no stone unturned to provide class-apart event management services. With our stunning indoor and outdoor decor, spectacular culinary creations for an artistic event experience, and all of it packed with supremely deluxe amenities, make us the one-stop solution for your perfect fairy tale wedding.Luxera Hotels Banquets Convention & CateringÂ is the right place if you are looking for a venue where you can host all your pre-wedding and wedding ceremonies. You can make it your home away from home for your wedding and have a great time with your family and friends. It is one of the few places in Delhi NCR that can accommodate all your needs including space and facilities.Luxera Hotels Banquets Convention & CateringÂ features Six different party areas including a Signature Lawn for big fat Indian weddings. For smaller gatherings, you can move to the indoor area called the Iris Hall. Signature Lawn It is all outdoors and like its name, it is decorated like a royal place. Signature LawnÂ will be more suitable for haldi, mehendi, teeka, and other pre-wedding rituals. The outdoor setting will provide comfort and create a decent background for photography.",
+        "role": "Iris Hall Ground",
+        "city": "delhi",
+        "int_price": 1800
+    }
+]

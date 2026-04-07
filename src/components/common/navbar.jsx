@@ -1,12 +1,14 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { Menu, X, LogOut, User, LayoutDashboard, Home, MapPin, Building2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  if (user?.role === 'admin') return null;
 
   const handleLogout = () => {
     logout();
@@ -15,10 +17,10 @@ const Navbar = () => {
   };
 
   const navLinks = [
-    { name: "Home", path: "/", icon: <Home size={18} /> },
-    { name: "Venues", path: "/venues", icon: <MapPin size={18} /> },
-    ...(user?.role === 'admin' ? [{ name: "Manage Halls", path: "/admin/manage-halls", icon: <Building2 size={18} /> }] : []),
-    ...(user ? [{ name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> }] : []),
+    { name: "Home", path: "/" },
+    { name: "Venues", path: "/venues" },
+    ...(user?.role === 'admin' ? [{ name: "Manage Halls", path: "/admin/manage-halls" }] : []),
+    ...(user ? [{ name: "Dashboard", path: "/dashboard" }] : []),
   ];
 
   return (
@@ -28,9 +30,6 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-indigo-200 shadow-lg">
-              B
-            </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-700 to-indigo-500 bg-clip-text text-transparent">
               BanquetBazar
             </span>
@@ -44,7 +43,6 @@ const Navbar = () => {
                 to={link.path}
                 className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-medium transition-colors"
               >
-                {link.icon}
                 {link.name}
               </Link>
             ))}
@@ -59,9 +57,9 @@ const Navbar = () => {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-full font-medium hover:bg-red-100 transition"
+                  className="bg-red-50 text-red-600 px-4 py-2 rounded-full font-medium hover:bg-red-100 transition"
                 >
-                  <LogOut size={16} /> Logout
+                  Logout
                 </button>
               </div>
             ) : (
@@ -94,20 +92,20 @@ const Navbar = () => {
                 className="flex items-center gap-3 block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-50"
                 onClick={() => setIsOpen(false)}
               >
-                {link.icon} {link.name}
+                {link.name}
               </Link>
             ))}
             <div className="border-t border-gray-100 my-2 pt-2">
               {user ? (
                 <>
-                  <div className="px-3 py-2 flex items-center gap-3 text-gray-700 font-medium">
-                    <User size={18} /> {user.username}
+                  <div className="px-3 py-2 text-gray-700 font-medium">
+                    {user.username}
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left flex items-center gap-3 px-3 py-3 text-red-600 font-medium hover:bg-red-50 rounded-md"
+                    className="w-full text-left px-3 py-3 text-red-600 font-medium hover:bg-red-50 rounded-md"
                   >
-                    <LogOut size={18} /> Logout
+                    Logout
                   </button>
                 </>
               ) : (
