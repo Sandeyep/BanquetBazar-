@@ -1,4 +1,5 @@
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./components/common/navbar";
 import AdminNavbar from "./components/common/AdminNavbar";
 import Footer from "./components/common/footer";
@@ -32,6 +33,7 @@ const App = () => {
 
   return (
     <>
+      <Toaster position="top-center" reverseOrder={false} />
       <Navbar />
       <AdminNavbar />
       <div className={`min-h-[calc(100vh-64px)] overflow-x-hidden ${user?.role === 'admin' ? 'pl-64' : ''}`}>

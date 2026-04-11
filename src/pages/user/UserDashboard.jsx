@@ -146,7 +146,13 @@ const UserDashboard = () => {
                                             </div>
                                             <div className="mt-4 flex gap-4 text-sm text-gray-600">
                                                 <span className="bg-gray-100 px-3 py-1 rounded-lg">Guests: <strong>{b.guest_count}</strong></span>
-                                                <span className="bg-gray-100 px-3 py-1 rounded-lg">Services: <strong>{b.services_count || 0}</strong></span>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {b.booked_services && b.booked_services.length > 0 ? b.booked_services.map((s, idx) => (
+                                                        <span key={idx} className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100">{s}</span>
+                                                    )) : (
+                                                        <span className="text-gray-400 text-[10px] font-bold bg-gray-50 px-2 py-0.5 rounded border border-gray-100">No Services</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="mt-6 md:mt-0 md:text-right md:pl-8 border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0">

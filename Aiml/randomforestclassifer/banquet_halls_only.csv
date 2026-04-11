@@ -1,7 +1,8 @@
 name,capacity,city,int_price,rating,event_types,cost_per_plate,decoration,makeup_artist,dj,photography
-Crystal Ballroom,200,biratnagar,3000,4.9,"Corporate, Meeting",500,10000,5000,5000,10000
 Platinum Plaza,350,pokhara,2200,4.6,Social Gathering,500,10000,5000,5000,10000
 Silver Sands,90,delhi,4000,4.7,"Wedding, Reception",500,10000,5000,5000,10000
+Verification Hall,500,test city,50000,4.0,,1000,10000,5000,5000,10000
+Crystal Ballroom,200,biratnagar,3000,4.9,"Corporate, Meeting",500,10000,5000,5000,10000
 Radiant Palace,294,lalitpur,1200,4.3,"Wedding, Reception",500,10000,5000,5000,10000
 Royale Diamond,175,lalitpur,20000,4.0,Wedding,500,10000,5000,5000,10000
 Golden Grove,500,kolkata,1000,3.8,"Wedding, Reception",500,10000,5000,5000,10000

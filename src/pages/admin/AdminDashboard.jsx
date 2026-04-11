@@ -53,6 +53,7 @@ const AdminDashboard = () => {
                                     <th className="p-4 border-b font-semibold text-gray-600">Venue</th>
                                     <th className="p-4 border-b font-semibold text-gray-600">Date</th>
                                     <th className="p-4 border-b font-semibold text-gray-600">Amount</th>
+                                    <th className="p-4 border-b font-semibold text-gray-600">Services</th>
                                     <th className="p-4 border-b font-semibold text-gray-600">Status</th>
                                     <th className="p-4 border-b font-semibold text-gray-600">Action</th>
                                 </tr>
@@ -81,6 +82,15 @@ const AdminDashboard = () => {
                                         <td className="p-4 text-gray-600">{b.hall_name}</td>
                                         <td className="p-4 text-gray-600">{b.event_date}</td>
                                         <td className="p-4 text-gray-600 font-medium">Rs {b.total_cost}</td>
+                                        <td className="p-4">
+                                            <div className="flex flex-wrap gap-1 max-w-[150px]">
+                                                {b.booked_services && b.booked_services.length > 0 ? b.booked_services.map((s, idx) => (
+                                                    <span key={idx} className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 whitespace-nowrap">{s}</span>
+                                                )) : (
+                                                    <span className="text-gray-400 text-[10px]">-</span>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="p-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${b.status === 'approved' ? 'bg-green-100 text-green-700' :
                                                 b.status === 'rejected' ? 'bg-red-100 text-red-700' :

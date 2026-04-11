@@ -17,6 +17,13 @@ class Booking(models.Model):
     guest_count = models.PositiveIntegerField()
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Service Flags
+    has_decoration = models.BooleanField(default=False)
+    has_dj = models.BooleanField(default=False)
+    has_makeup = models.BooleanField(default=False)
+    has_photography = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -86,9 +86,13 @@ const VenueDetail = () => {
         try {
             await api.post('/bookings/', {
                 hall: hallId,
-                services: selectedServices,
+                services: [], // We are using specific flags for now
                 event_date: eventDate,
-                guest_count: guestCount
+                guest_count: guestCount,
+                has_decoration: selectedServices.includes('decoration'),
+                has_dj: selectedServices.includes('dj'),
+                has_makeup: selectedServices.includes('makeup'),
+                has_photography: selectedServices.includes('photography'),
             });
             toast.success('Booking request sent successfully!');
             navigate('/dashboard');
